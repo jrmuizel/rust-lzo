@@ -1,0 +1,2 @@
+This is a pure rust version of the linux kernel's lzo implementation
+It has been converted to rust using corrode
