@@ -2,6 +2,7 @@ mod lzo1x_compress;
 mod lzo1x_decompress_safe;
 extern crate libc;
 use std::mem;
+use std::slice;
 
 pub fn worst_compress(x: usize) -> usize {
     ((x) + ((x) / 16) + 64 + 3)
@@ -42,10 +43,11 @@ impl LZOContext {
         LZOContext { wrkmem: unsafe { libc::malloc(LZO1X_MEM_COMPRESS) } }
     }
 
-    pub unsafe fn compress(&mut self,
-                           in_: &[u8],
-                           out: &mut[u8])
-                           -> (usize, LZOError) {
+    pub fn compress<'a>(&mut self,
+                               in_: &[u8],
+                               out: &'a mut[u8])
+                               -> (&'a mut [u8], LZOError) {
+        unsafe {
         let mut out_len = out.len();
         let err = lzo1x_compress::lzo1x_1_compress(in_.as_ptr(),
                                                    in_.len(),
@@ -54,23 +56,25 @@ impl LZOContext {
                                                    &mut *self.wrkmem as
                                                    *mut _ as
                                                    *mut _);
-        (out_len, mem::transmute::<i32, LZOError>(err))
+        (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len), mem::transmute::<i32, LZOError>(err))
+        }
     }
-    pub unsafe fn decompress(in_: &[u8],
-                             out: &mut[u8])
-                             -> (usize, LZOError) {
+    pub fn decompress<'a>(in_: &[u8],
+                                 out: &'a mut[u8])
+                                 -> (&'a mut [u8], LZOError) {
+        unsafe {
         let mut out_len = out.len();
         let err = lzo1x_decompress_safe::lzo1x_decompress_safe(in_.as_ptr(),
                                                                in_.len(),
                                                                out.as_mut_ptr(),
                                                                &mut out_len);
-        (out_len, mem::transmute::<i32, LZOError>(err))
+        (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len), mem::transmute::<i32, LZOError>(err))
+        }
     }
 }
 
 #[test]
 fn it_works() {
-    use std::slice;
     unsafe {
         let data = [0u8, 2, 3, 4, 2, 3, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     2, 3, 4, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3,
@@ -79,14 +83,15 @@ fn it_works() {
         let mut dst_len: usize = worst_compress(mem::size_of_val(&data));
         let dst = libc::malloc(dst_len);
         let mut ctx = LZOContext::new();
-        let (dst_len, err) = ctx.compress(&data, &mut slice::from_raw_parts_mut(dst as *mut u8, dst_len));
-        println!("{}", dst_len);
+        let mut dst = slice::from_raw_parts_mut(dst as *mut u8, dst_len);
+        let (dst, err) = ctx.compress(&data, &mut dst);
+        println!("{}", dst.len());
 
         let dec_dst = libc::malloc(mem::size_of_val(&data));
         let mut result_len = mem::size_of_val(&data);
-        let dst = slice::from_raw_parts(dst as *const u8, dst_len);
-        let (result_len, err) = LZOContext::decompress(&dst, &mut slice::from_raw_parts_mut(dec_dst as *mut u8, result_len));
-        println!("{}", result_len);
+        let mut dec_dst = slice::from_raw_parts_mut(dec_dst as *mut u8, result_len);
+        let (result, err) = LZOContext::decompress(&dst, &mut dec_dst);
+        println!("{}", result.len());
     }
 
 }
