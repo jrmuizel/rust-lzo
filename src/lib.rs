@@ -1,9 +1,8 @@
-
-
 mod lzo1x_compress;
 mod lzo1x_decompress_safe;
 extern crate libc;
 use std::mem;
+
 fn lzo1x_worst_compress(x: usize) -> usize {
     ((x) + ((x) / 16) + 64 + 3)
 }
