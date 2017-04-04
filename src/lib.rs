@@ -4,6 +4,7 @@ extern crate libc;
 use std::mem;
 use std::slice;
 
+/// for a given size computes the worst case size that the compresed result can be
 pub fn worst_compress(x: usize) -> usize {
     ((x) + ((x) / 16) + 64 + 3)
 }
@@ -43,6 +44,7 @@ impl LZOContext {
         LZOContext { wrkmem: unsafe { libc::malloc(LZO1X_MEM_COMPRESS) } }
     }
 
+    /// returns a slice containing the compressed data
     pub fn compress<'a>(&mut self,
                                in_: &[u8],
                                out: &'a mut[u8])
@@ -59,6 +61,8 @@ impl LZOContext {
         (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len), mem::transmute::<i32, LZOError>(err))
         }
     }
+
+    /// returns a slice containing the decompressed data
     pub fn decompress<'a>(in_: &[u8],
                                  out: &'a mut[u8])
                                  -> (&'a mut [u8], LZOError) {
