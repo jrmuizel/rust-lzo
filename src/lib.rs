@@ -12,7 +12,7 @@ const LZO1X_1_MEM_COMPRESS: usize = (8192 * 16);
 const LZO1X_MEM_COMPRESS: usize = LZO1X_1_MEM_COMPRESS;
 
 #[repr(i32)]
-enum LZOError {
+pub enum LZOError {
     OK = 0,
     ERROR = -1,
     OUT_OF_MEMORY = -2,
