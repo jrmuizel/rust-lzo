@@ -3,7 +3,7 @@ mod lzo1x_decompress_safe;
 extern crate libc;
 use std::mem;
 
-fn lzo1x_worst_compress(x: usize) -> usize {
+pub fn worst_compress(x: usize) -> usize {
     ((x) + ((x) / 16) + 64 + 3)
 }
 
@@ -76,7 +76,7 @@ fn it_works() {
                     2, 3, 4, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3,
                     4, 2, 2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4, 2,
                     2, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 4];
-        let mut dst_len: usize = lzo1x_worst_compress(mem::size_of_val(&data));
+        let mut dst_len: usize = worst_compress(mem::size_of_val(&data));
         let dst = libc::malloc(dst_len);
         let mut ctx = LZOContext::new();
         let (dst_len, err) = ctx.compress(&data, &mut slice::from_raw_parts_mut(dst as *mut u8, dst_len));
