@@ -5,6 +5,7 @@ authors = ["Jeff Muizelaar <jmuizelaar@mozilla.com>"]
 description = "A pure rust implementation of lzo converted from Linux's C implementation using corrode"
 license = "GPL-2.0"
 repository = "https://github.com/jrmuizel/rust-lzo"
+categories = ["compression"]
 
 [dependencies]
 libc = "0.2.21"
