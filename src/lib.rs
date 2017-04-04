@@ -26,7 +26,7 @@ enum LZOError {
     INVALID_ARGUMENT = -10,
 }
 
-struct LZOContext {
+pub struct LZOContext {
     wrkmem: *mut libc::c_void,
 }
 
@@ -39,16 +39,16 @@ impl Drop for LZOContext {
 }
 
 impl LZOContext {
-    fn new() -> LZOContext {
+    pub fn new() -> LZOContext {
         LZOContext { wrkmem: unsafe { libc::malloc(LZO1X_MEM_COMPRESS) } }
     }
 
-    unsafe fn compress(&mut self,
-                       in_: *const u8,
-                       in_len: usize,
-                       out: *mut u8,
-                       out_len: *mut usize)
-                       -> LZOError {
+    pub unsafe fn compress(&mut self,
+                           in_: *const u8,
+                           in_len: usize,
+                           out: *mut u8,
+                           out_len: *mut usize)
+                           -> LZOError {
         mem::transmute::<i32, LZOError>(lzo1x_compress::lzo1x_1_compress(in_,
                                                                          in_len,
                                                                          out,
@@ -57,11 +57,11 @@ impl LZOContext {
                                                                          *mut _ as
                                                                          *mut _))
     }
-    unsafe fn decompress(in_: *const u8,
-                         in_len: usize,
-                         out: *mut u8,
-                         out_len: *mut usize)
-                         -> LZOError {
+    pub unsafe fn decompress(in_: *const u8,
+                             in_len: usize,
+                             out: *mut u8,
+                             out_len: *mut usize)
+                             -> LZOError {
         mem::transmute::<i32, LZOError>(lzo1x_decompress_safe::lzo1x_decompress_safe(in_,
                                                                                      in_len,
                                                                                      out,
