@@ -45,34 +45,29 @@ impl LZOContext {
     }
 
     /// returns a slice containing the compressed data
-    pub fn compress<'a>(&mut self,
-                               in_: &[u8],
-                               out: &'a mut[u8])
-                               -> (&'a mut [u8], LZOError) {
+    pub fn compress<'a>(&mut self, in_: &[u8], out: &'a mut [u8]) -> (&'a mut [u8], LZOError) {
         unsafe {
-        let mut out_len = out.len();
-        let err = lzo1x_compress::lzo1x_1_compress(in_.as_ptr(),
-                                                   in_.len(),
-                                                   out.as_mut_ptr(),
-                                                   &mut out_len,
-                                                   &mut *self.wrkmem as
-                                                   *mut _ as
-                                                   *mut _);
-        (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len), mem::transmute::<i32, LZOError>(err))
+            let mut out_len = out.len();
+            let err = lzo1x_compress::lzo1x_1_compress(in_.as_ptr(),
+                                                       in_.len(),
+                                                       out.as_mut_ptr(),
+                                                       &mut out_len,
+                                                       &mut *self.wrkmem as *mut _ as *mut _);
+            (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len),
+             mem::transmute::<i32, LZOError>(err))
         }
     }
 
     /// returns a slice containing the decompressed data
-    pub fn decompress<'a>(in_: &[u8],
-                                 out: &'a mut[u8])
-                                 -> (&'a mut [u8], LZOError) {
+    pub fn decompress<'a>(in_: &[u8], out: &'a mut [u8]) -> (&'a mut [u8], LZOError) {
         unsafe {
-        let mut out_len = out.len();
-        let err = lzo1x_decompress_safe::lzo1x_decompress_safe(in_.as_ptr(),
-                                                               in_.len(),
-                                                               out.as_mut_ptr(),
-                                                               &mut out_len);
-        (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len), mem::transmute::<i32, LZOError>(err))
+            let mut out_len = out.len();
+            let err = lzo1x_decompress_safe::lzo1x_decompress_safe(in_.as_ptr(),
+                                                                   in_.len(),
+                                                                   out.as_mut_ptr(),
+                                                                   &mut out_len);
+            (slice::from_raw_parts_mut(out.as_mut_ptr(), out_len),
+             mem::transmute::<i32, LZOError>(err))
         }
     }
 }
