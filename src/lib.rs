@@ -4,9 +4,9 @@ extern crate libc;
 use std::mem;
 use std::slice;
 
-/// for a given size computes the worst case size that the compresed result can be
-pub fn worst_compress(x: usize) -> usize {
-    ((x) + ((x) / 16) + 64 + 3)
+/// for a given `size` computes the worst case size that the compresed result can be
+pub fn worst_compress(size: usize) -> usize {
+    ((size) + ((size) / 16) + 64 + 3)
 }
 
 const LZO1X_1_MEM_COMPRESS: usize = (8192 * 16);
