@@ -76,11 +76,8 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
 	op = out;
 	ip = in;
 
-	if (unlikely(in_len < 3)) {
-		*out_len = op - out;
-		return LZO_E_INPUT_OVERRUN;
-	}
-
+	if (unlikely(in_len < 3))
+		goto input_overrun;
 	if (*ip > 17) {
 		t = *ip++ - 17;
 		if (t < 4) {
