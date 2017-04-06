@@ -11,6 +11,34 @@
  *  Richard Purdie <rpurdie@openedhand.com>
  */
 
+typedef uint32_t u32;
+typedef uint16_t u16;
+typedef uint64_t u64;
+
+static inline u32 get_unaligned(const void *p)
+{
+	u32 ret = 0;
+	memcpy(&ret, p, sizeof(ret));
+	return ret;
+}
+
+static inline void put_unaligned(u32 v, void *p)
+{
+	memcpy(p, &v, sizeof(v));
+}
+
+static inline u32 get_unaligned_le32(const void *p)
+{
+	const char *input = p;
+	return input[0] | (input[1] << 8) | (input[2] << 16) | (input[3] << 24);
+}
+
+static inline u16 get_unaligned_le16(const void *p)
+{
+	const char *input = p;
+	return input[0] | (input[1] << 8);
+}
+
 
 #define COPY4(dst, src)	\
 		put_unaligned(get_unaligned((const u32 *)(src)), (u32 *)(dst))

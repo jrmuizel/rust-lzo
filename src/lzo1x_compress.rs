@@ -12,13 +12,14 @@ extern {
 unsafe extern fn get_unaligned_le32(
     mut p : *const ::std::os::raw::c_void
 ) -> u32 {
-    let mut ret : u32 = 0u32;
-    memcpy(
-        &mut ret as (*mut u32) as (*mut ::std::os::raw::c_void),
-        p,
-        ::std::mem::size_of::<u32>()
-    );
-    ret
+    let mut input : *const u8 = p as (*const u8);
+    (*input.offset(0isize) as (i32) | *input.offset(
+                                           1isize
+                                       ) as (i32) << 8i32 | *input.offset(
+                                                                 2isize
+                                                             ) as (i32) << 16i32 | *input.offset(
+                                                                                        3isize
+                                                                                    ) as (i32) << 24i32) as (u32)
 }
 
 unsafe extern fn put_unaligned(

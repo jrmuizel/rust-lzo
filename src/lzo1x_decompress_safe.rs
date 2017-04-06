@@ -1,21 +1,10 @@
-extern {
-    fn memcpy(
-        __dest : *mut ::std::os::raw::c_void,
-        __src : *const ::std::os::raw::c_void,
-        __n : usize
-    ) -> *mut ::std::os::raw::c_void;
-}
-
 unsafe extern fn get_unaligned_le16(
     mut p : *const ::std::os::raw::c_void
 ) -> u16 {
-    let mut ret : u16 = 0u16;
-    memcpy(
-        &mut ret as (*mut u16) as (*mut ::std::os::raw::c_void),
-        p,
-        ::std::mem::size_of::<u16>()
-    );
-    ret
+    let mut input : *const u8 = p as (*const u8);
+    (*input.offset(0isize) as (i32) | *input.offset(
+                                           1isize
+                                       ) as (i32) << 8i32) as (u16)
 }
 
 #[no_mangle]

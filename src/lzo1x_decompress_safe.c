@@ -14,36 +14,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-typedef uint32_t u32;
-typedef uint16_t u16;
-typedef uint64_t u64;
 #include "lzodefs.h"
 #include "lzo.h"
 
 #define unlikely(x) (x)
 #define likely(x) (x)
 #define noinline
-
-static inline u32 get_unaligned_le32(const void *p)
-{
-        u32 ret;
-        memcpy(&ret, p, sizeof(ret));
-        return ret;
-}
-
-static inline u16 get_unaligned_le16(const void *p)
-{
-        u16 ret = 0;
-        memcpy(&ret, p, sizeof(ret));
-        return ret;
-}
-
-static inline u32 get_unaligned(const void *p)
-{
-        u32 ret;
-        memcpy(&ret, p, sizeof(ret));
-        return ret;
-}
 
 
 #define HAVE_IP(x)      ((size_t)(ip_end - ip) >= (size_t)(x))

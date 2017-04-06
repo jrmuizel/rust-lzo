@@ -13,33 +13,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdint.h>
-typedef uint32_t u32;
-typedef uint64_t u64;
 #include "lzodefs.h"
 #include "lzo.h"
 
 #define unlikely(x) x
 
 #define noinline
-
-static inline u32 get_unaligned_le32(const void *p)
-{
-	u32 ret = 0;
-	memcpy(&ret, p, sizeof(ret));
-	return ret;
-}
-
-static inline u32 get_unaligned(const void *p)
-{
-	u32 ret = 0;
-	memcpy(&ret, p, sizeof(ret));
-	return ret;
-}
-
-static inline void put_unaligned(u32 v, void *p)
-{
-	memcpy(p, &v, sizeof(v));
-}
 
 static noinline size_t
 lzo1x_1_do_compress(const unsigned char *in, size_t in_len,
