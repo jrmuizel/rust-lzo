@@ -106,7 +106,6 @@ int lzo1x_decompress_safe(const unsigned char *in, size_t in_len,
 
 	for (;;) {
 		t = *ip++;
-		int do_match_next = 0;
 		if (t < 16) {
 			if (likely(state == 0)) {
 				if (unlikely(t == 0)) {
@@ -161,7 +160,7 @@ copy_literal_run:
 				op[0] = m_pos[0];
 				op[1] = m_pos[1];
 				op += 2;
-				do_match_next = 1;
+				goto match_next;
 			} else {
 				next = t & 3;
 				m_pos = op - (1 + M2_MAX_OFFSET);
@@ -222,16 +221,10 @@ copy_literal_run:
 			ip += 2;
 			m_pos -= next >> 2;
 			next &= 3;
-			if (m_pos == op) {
-				*out_len = op - out;
-				return (t != 3       ? LZO_E_ERROR :
-					ip == ip_end ? LZO_E_OK :
-					ip <  ip_end ? LZO_E_INPUT_NOT_CONSUMED : LZO_E_INPUT_OVERRUN);
-
-			}
+			if (m_pos == op)
+				goto eof_found;
 			m_pos -= 0x4000;
 		}
-		if (!do_match_next) {
 		TEST_LB(m_pos);
 #if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS)
 		if (op - m_pos >= 8) {
@@ -271,7 +264,6 @@ copy_literal_run:
 			do {
 				*op++ = *m_pos++;
 			} while (op < oe);
-		}
 		}
 match_next:
 		state = next;
