@@ -48,9 +48,9 @@ static inline u32 get_unaligned(const void *p)
 
 #define HAVE_IP(x)      ((size_t)(ip_end - ip) >= (size_t)(x))
 #define HAVE_OP(x)      ((size_t)(op_end - op) >= (size_t)(x))
-#define NEED_IP(x)      if (!HAVE_IP(x)) { *out_len = op - out; return LZO_E_INPUT_OVERRUN;}
-#define NEED_OP(x)      if (!HAVE_OP(x)) { *out_len = op - out; return LZO_E_LOOKBEHIND_OVERRUN; }
-#define TEST_LB(m_pos)  if ((m_pos) < out) { *out_len = op - out; return LZO_E_LOOKBEHIND_OVERRUN; }
+#define NEED_IP(x)      if (!HAVE_IP(x)) goto input_overrun
+#define NEED_OP(x)      if (!HAVE_OP(x)) goto output_overrun
+#define TEST_LB(m_pos)  if ((m_pos) < out) goto lookbehind_overrun
 
 /* This MAX_255_COUNT is the maximum number of times we can add 255 to a base
  * count without overflowing an integer. The multiply will overflow when
@@ -249,4 +249,16 @@ match_next:
 	return (t != 3       ? LZO_E_ERROR :
 		ip == ip_end ? LZO_E_OK :
 		ip <  ip_end ? LZO_E_INPUT_NOT_CONSUMED : LZO_E_INPUT_OVERRUN);
+
+input_overrun:
+	*out_len = op - out;
+	return LZO_E_INPUT_OVERRUN;
+
+output_overrun:
+	*out_len = op - out;
+	return LZO_E_OUTPUT_OVERRUN;
+
+lookbehind_overrun:
+	*out_len = op - out;
+	return LZO_E_LOOKBEHIND_OVERRUN;
 }
